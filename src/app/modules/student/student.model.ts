@@ -10,7 +10,6 @@ import {
   TUserName,
 } from './student.interface';
 
-
 const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
@@ -134,6 +133,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       required: true,
     },
     profileImg: { type: String },
+    admissionSemester: { type: Schema.Types.ObjectId, ref: 'AcademicSemester' },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -180,7 +180,5 @@ studentSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
   next();
 });
-
-
 
 export const Student = model<TStudent, StudentModel>('Student', studentSchema);

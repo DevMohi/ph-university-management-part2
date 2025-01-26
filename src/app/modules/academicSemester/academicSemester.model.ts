@@ -1,32 +1,10 @@
 import { model, Schema } from 'mongoose';
+import { TAcademicSemester } from './academicSemester.interface';
 import {
-  TAcademicSemester,
-  TAcademicSemesterCode,
-  TAcademicSemesterName,
-  TMonths,
-} from './academicSemester.interface';
-
-const Months: TMonths[] = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-
-const AcademicSemesterName: TAcademicSemesterName[] = [
-  'Autmun',
-  'Summer',
-  'Fall',
-];
-const AcademicSemesterCode: TAcademicSemesterCode[] = ['01', '02', '03'];
+  AcademicSemesterCode,
+  AcademicSemesterName,
+  Months,
+} from './academicSemester.constant';
 
 const academicSemesterSchema = new Schema<TAcademicSemester>(
   {
@@ -36,7 +14,7 @@ const academicSemesterSchema = new Schema<TAcademicSemester>(
       enum: AcademicSemesterName,
     },
     year: {
-      type: Date,
+      type: String,
       required: true,
     },
     code: {
@@ -60,7 +38,25 @@ const academicSemesterSchema = new Schema<TAcademicSemester>(
   },
 );
 
+//pre hook , save korar age data check , eki name e eki bochore duita sem hobena , hook gulor kase document access thake aijnno before save we can check this
+academicSemesterSchema.pre('save', async function (next) {
+  const isSemesterExist = await AcademicSemester.findOne({
+    year: this.year,
+    name: this.name,
+  });
+
+  if (isSemesterExist) {
+    throw new Error('Semester already exists');
+  }
+  next();
+});
+
 export const AcademicSemester = model<TAcademicSemester>(
   'AcademidSemester',
   academicSemesterSchema,
 );
+
+//name and year lagbe for checking semesterExist before data entry
+//Autumn 01
+//Summer 02
+// Fall 03
